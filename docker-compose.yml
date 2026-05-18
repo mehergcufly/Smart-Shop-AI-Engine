@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+
+  # ── PostgreSQL Database ──────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: sshop_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       sshop_db
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: db155867
+    ports:
+      - "5433:5432"          # 5433 on host to avoid conflict with your local PG
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sshop_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── FastAPI Backend ──────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sshop_api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Override DATABASE_URL to point to Docker's db service
+      DATABASE_URL: postgresql://postgres:db155867@db:5432/sshop_db
+    volumes:
+      - ./backend:/app                  # live reload during dev
+      - ./frontend:/frontend
+      - model_data:/app/models          # persist trained models
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  model_data:
