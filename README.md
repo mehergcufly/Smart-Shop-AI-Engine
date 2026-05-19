@@ -160,7 +160,7 @@ SENDER_NAME=            # Display name in emails
 # Test DB connection
 python -c "
 import psycopg2
-conn = psycopg2.connect('postgresql://postgres:db155867@localhost:5432/sshop_db')
+conn = psycopg2.connect('db connection')
 print('DB OK'); conn.close()
 "
 
