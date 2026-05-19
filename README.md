@@ -39,7 +39,7 @@ smart-shop/
 ├── train_model.py           # One-time model training script
 ├── Dockerfile
 ├── docker-compose.yml
-└── .env
+
 ```
 
 ---
